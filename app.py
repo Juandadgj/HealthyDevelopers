@@ -3,8 +3,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:JdGj1100080400@localhost/healthy_developers'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://juandadgj:JdGj1100080400@healthydevelopers.cvoacfqtexlc.us-east-2.rds.amazonaws.com/healthydevelopers'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# mysql+pymysql://root:JdGj1100080400@localhost/healthy_developers
+# mysql+pymysql://juandadgj:JdGj1100080400@healthydevelopers.cvoacfqtexlc.us-east-2.rds.amazonaws.com/healthydevelopers
 
 db = SQLAlchemy(app)
 mar = Marshmallow(app)
@@ -63,14 +65,15 @@ def get_users():
     result = users_schema.dump(all_users)
     return jsonify(result)
 
-@app.route('/users/<id>', methods=['GET'])
-def get_user(id):
-    user = User.query.get(id)
+@app.route('/users/<mail>', methods=['GET'])
+def get_user(mail):
+    user = User.query.filter_by(mail=mail).first()
+    print(user)
     return user_schema.jsonify(user)
 
-@app.route('/users/<id>', methods=['PUT'])
-def update_user(id):
-    user = User.query.get(id)
+@app.route('/users/<mail>', methods=['PUT'])
+def update_user(mail):
+    user = User.query.filter_by(mail=mail).first()
     name = request.json['name']
     last_name = request.json['last_name']
     sex = request.json['sex']
@@ -90,13 +93,13 @@ def update_user(id):
     db.session.commit()
     return user_schema.jsonify(user)
 
-@app.route('/users/<id>', methods=['DELETE'])
-def delete_user(id):
-    user = User.query.get(id)
+@app.route('/users/<mail>', methods=['DELETE'])
+def delete_user(mail):
+    user = User.query.filter_by(mail=mail).first()
     db.session.delete(user)
     db.session.commit()
 
     return user_schema.jsonify(user)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
