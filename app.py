@@ -11,7 +11,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 mar = Marshmallow(app)
 
-
 class User(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column(db.String(30), nullable=False)
@@ -42,7 +41,7 @@ users_schema = UserSchema(many=True)
 
 @app.route('/', methods=['GET'])
 def index():
-    return jsonify("message: Welcome to our API")
+    return jsonify(message="Welcome to our API")
 
 @app.route('/users', methods=['POST'])
 def create_user():
@@ -101,5 +100,13 @@ def delete_user(mail):
 
     return user_schema.jsonify(user)
 
+@app.route('/login/mail=<mail>&password=<password>', methods=['GET'])
+def login(mail, password):
+    user = User.query.filter_by(mail=mail).first()
+    if user.password == password:
+        return jsonify(message="Correct")
+    else:
+        return jsonify(message="Incorrect")
+
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
