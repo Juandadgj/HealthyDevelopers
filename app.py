@@ -109,4 +109,4 @@ def login(mail, password):
         return jsonify(message="Incorrect")
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run()
