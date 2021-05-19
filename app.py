@@ -3,11 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://juandadgj:JdGj1100080400@healthydevelopers.cvoacfqtexlc.us-east-2.rds.amazonaws.com/healthydevelopers'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://b694ff5d16630d:d6ef68c2@us-cdbr-east-03.cleardb.com/heroku_f6deb47a67d65f8'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # mysql+pymysql://root:JdGj1100080400@localhost/healthy_developers
 # mysql+pymysql://juandadgj:JdGj1100080400@healthydevelopers.cvoacfqtexlc.us-east-2.rds.amazonaws.com/healthydevelopers
 # mysql://b6f8189f16420f:08256ce0@us-cdbr-east-03.cleardb.com/heroku_81bb379d58fee0e
+# mysql://b694ff5d16630d:d6ef68c2@us-cdbr-east-03.cleardb.com/heroku_f6deb47a67d65f8
 
 db = SQLAlchemy(app)
 mar = Marshmallow(app)
