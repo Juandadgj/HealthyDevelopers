@@ -3,11 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://b694ff5d16630d:d6ef68c2@us-cdbr-east-03.cleardb.com/heroku_f6deb47a67d65f8'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:JdGj1100080400@localhost/healthy_developers'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # mysql+pymysql://root:JdGj1100080400@localhost/healthy_developers
-# mysql+pymysql://juandadgj:JdGj1100080400@healthydevelopers.cvoacfqtexlc.us-east-2.rds.amazonaws.com/healthydevelopers
-# mysql://b6f8189f16420f:08256ce0@us-cdbr-east-03.cleardb.com/heroku_81bb379d58fee0e
 # mysql://b694ff5d16630d:d6ef68c2@us-cdbr-east-03.cleardb.com/heroku_f6deb47a67d65f8
 
 db = SQLAlchemy(app)
@@ -32,14 +30,32 @@ class User(db.Model):
         self.phone = phone
         self.direction = direction
 
+class Habit(db.Model):
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.String(), nullable=False)
+    category = db.Column(db.String(45), nullable=False)
+
+    def __init__(self, title, description, category):
+        self.title = title
+        self.description = description
+        self.category = category
+
+
 db.create_all()
 
 class UserSchema(mar.Schema):
     class Meta:
         fields = ('id', 'name', 'last_name', 'sex', 'mail', 'password', 'phone', 'direction')
 
+class HabitSchema(mar.Schema):
+    class Meta:
+        fields = ('id', 'title', 'description', 'category')
+
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
+habit_schema = HabitSchema()
+habits_schema = HabitSchema(many=True)
 
 @app.route('/', methods=['GET'])
 def index():
@@ -109,6 +125,12 @@ def login(mail, password):
         return jsonify(message="Correct")
     else:
         return jsonify(message="Incorrect")
+
+@app.route('/habits', methods=['GET'])
+def get_habits():
+    all_habits = Habit.query.all()
+    result = habits_schema.dump(all_habits)
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run()
