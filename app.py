@@ -45,7 +45,7 @@ class Progress(db.Model):
     id = db.Column(db.Integer, autoincrement=True,primary_key=True)
     usermail = db.Column(db.String(255), nullable=False)
     habitid = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.String(45), nullable=False)
+    status = db.Column(db.Integer, nullable=False)
 
     def __init__(self, usermail, habitid, status):
         self.usermail = usermail
