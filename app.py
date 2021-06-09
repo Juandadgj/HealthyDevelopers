@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://b694ff5d16630d:d6ef68c2@us-cdbr-east-03.cleardb.com/heroku_f6deb47a67d65f8'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:JdGj1100080400@localhost/healthy_developers'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # mysql+pymysql://root:JdGj1100080400@localhost/healthy_developers
 # mysql+pymysql://b694ff5d16630d:d6ef68c2@us-cdbr-east-03.cleardb.com/heroku_f6deb47a67d65f8
@@ -41,6 +41,16 @@ class Habit(db.Model):
         self.description = description
         self.category = category
 
+class Progress(db.Model):
+    id = db.Column(db.Integer, autoincrement=True,primary_key=True)
+    usermail = db.Column(db.String(255), nullable=False)
+    habitid = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.String(45), nullable=False)
+
+    def __init__(self, usermail, habitid, status):
+        self.usermail = usermail
+        self.habitid = habitid
+        self.status = status
 
 db.create_all()
 
@@ -52,10 +62,16 @@ class HabitSchema(mar.Schema):
     class Meta:
         fields = ('id', 'title', 'description', 'category')
 
+class ProgressSchema(mar.Schema):
+    class Meta:
+        fields = ('id','usermail','habitid','status')
+
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
 habit_schema = HabitSchema()
 habits_schema = HabitSchema(many=True)
+progress_schema = ProgressSchema()
+progresess_schema = ProgressSchema(many=True)
 
 @app.route('/', methods=['GET'])
 def index():
@@ -131,6 +147,31 @@ def get_habits():
     all_habits = Habit.query.all()
     result = habits_schema.dump(all_habits)
     return jsonify(result)
+
+@app.route('/progress/<mail>', methods=['GET'])
+def get_progress(mail):
+    progress = Progress.query.filter_by(usermail=mail)
+    result = progresess_schema.dump(progress)
+    return jsonify(result)
+
+@app.route('/progress', methods=['POST'])
+def create_progress():
+    usermail = request.json['usermail']
+    habitid = request.json['habitid']
+    status = request.json['status']
+
+    new_progress = Progress(usermail, habitid, status)
+    db.session.add(new_progress)
+    db.session.commit()
+    return progress_schema.jsonify(new_progress)
+
+@app.route('/progress/mail=<mail>&habitid=<habitid>', methods=['PATCH'])
+def update_progress(mail, habitid):
+    progress = Progress.query.filter_by(usermail=mail, habitid=habitid).first()
+    status = request.json['status']
+    progress.status = status
+    db.session.commit()
+    return progress_schema.jsonify(progress)
 
 if __name__ == '__main__':
     app.run()
