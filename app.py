@@ -42,7 +42,7 @@ class Habit(db.Model):
         self.category = category
 
 class Progress(db.Model):
-    id = db.Column(db.Integer, autoincrement=True,primary_key=True)
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     usermail = db.Column(db.String(255), nullable=False)
     habitid = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Integer, nullable=False)
@@ -64,7 +64,7 @@ class HabitSchema(mar.Schema):
 
 class ProgressSchema(mar.Schema):
     class Meta:
-        fields = ('id','usermail','habitid','status')
+        fields = ('id', 'usermail', 'habitid', 'status')
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
@@ -165,8 +165,10 @@ def create_progress():
     db.session.commit()
     return progress_schema.jsonify(new_progress)
 
-@app.route('/progress/mail=<mail>&habitid=<habitid>', methods=['PATCH'])
-def update_progress(mail, habitid):
+@app.route('/progress', methods=['PATCH'])
+def update_progress():
+    mail = request.json['usermail']
+    habitid = request.json['habitid']
     progress = Progress.query.filter_by(usermail=mail, habitid=habitid).first()
     status = request.json['status']
     progress.status = status
