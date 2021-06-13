@@ -131,7 +131,6 @@ def delete_user(mail):
     user = User.query.filter_by(mail=mail).first()
     db.session.delete(user)
     db.session.commit()
-
     return user_schema.jsonify(user)
 
 @app.route('/login/mail=<mail>&password=<password>', methods=['GET'])
@@ -172,6 +171,15 @@ def update_progress():
     progress = Progress.query.filter_by(usermail=mail, habitid=habitid).first()
     status = request.json['status']
     progress.status = status
+    db.session.commit()
+    return progress_schema.jsonify(progress)
+
+@app.route('/progress', methods=['DELETE'])
+def delete_progress():
+    mail = request.json['usermail']
+    habitid = request.json['habitid']
+    progress = Progress.query.filter_by(usermail=mail, habitid=habitid).first()
+    db.session.delete(progress)
     db.session.commit()
     return progress_schema.jsonify(progress)
 
