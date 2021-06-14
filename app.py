@@ -174,11 +174,10 @@ def update_progress():
     db.session.commit()
     return progress_schema.jsonify(progress)
 
-@app.route('/progress', methods=['DELETE'])
-def delete_progress():
-    mail = request.json['usermail']
-    habitid = request.json['habitid']
-    progress = Progress.query.filter_by(usermail=mail, habitid=habitid).first()
+@app.route('/progress/<mail>', methods=['DELETE'])
+def delete_progress(mail):
+    mail = mail
+    progress = Progress.query.filter_by(usermail=mail).order_by(Progress.id.desc()).first()
     db.session.delete(progress)
     db.session.commit()
     return progress_schema.jsonify(progress)
